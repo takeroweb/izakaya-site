@@ -60,6 +60,8 @@ const DEFAULT_DATA = {
     }
   ],
   menu: {
+    bg_image: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1920&q=80',
+    catch: '備長炭の炎が生み出す、一期一会の肴。\n今宵の献立をご覧ください。',
     categories: [
       {
         label: 'おすすめ',

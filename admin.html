@@ -1099,6 +1099,31 @@
     <p class="panel-subheading">メニューのアイテムを追加・編集・削除できます。カテゴリも自由に追加できます。</p>
 
     <div class="card">
+      <div class="card-title">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        メニューセクションの見た目
+      </div>
+      <div class="form-grid">
+        <div class="form-group form-full">
+          <label>キャッチコピー（「料理はこちら」ボタンの上に表示）</label>
+          <textarea id="menu-catch" class="short" placeholder="備長炭の炎が生み出す、一期一会の肴。&#10;今宵の献立をご覧ください。"></textarea>
+          <span class="form-hint">改行は実際の改行で入力してください。</span>
+        </div>
+        <div class="form-group form-full">
+          <label>背景画像</label>
+          <label class="btn-file-upload" for="menu-bg-file">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            写真を追加
+          </label>
+          <input type="file" id="menu-bg-file" accept="image/*" style="display:none" onchange="handleFileUpload(this,'menu-bg_image','menu-bg-img-preview')" />
+        </div>
+        <div class="img-preview-wrap form-full">
+          <img class="img-preview" id="menu-bg-img-preview" alt="メニュー背景プレビュー" />
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="menu-tabs-admin-wrap" id="admin-menu-tabs-wrap">
         <div class="menu-tabs-admin" id="admin-menu-tabs">
           <button class="menu-tab-add-btn" id="menu-tab-add-btn" onclick="toggleAddCatForm()">＋ カテゴリを追加</button>
@@ -1341,7 +1366,13 @@
     // Concepts
     renderConceptItems(data.concepts);
 
-    // Menu
+    // Menu section appearance
+    const menuCatchEl = document.getElementById('menu-catch');
+    if (menuCatchEl) menuCatchEl.value = (data.menu && data.menu.catch) ? data.menu.catch : '';
+    if (data.menu && data.menu.bg_image) fileUploads['menu-bg_image'] = data.menu.bg_image;
+    previewImg('menu-bg-img-preview', data.menu && data.menu.bg_image);
+
+    // Menu categories
     activeCatIndex = 0;
     renderAllCategoryTabs(data.menu.categories || []);
 
@@ -1900,7 +1931,12 @@
       text:  v(`concept-text-${i}`,  '')
     }));
 
-    // Menu
+    // Menu section appearance
+    if (!data.menu) data.menu = {};
+    data.menu.catch    = v('menu-catch', '');
+    data.menu.bg_image = getImgValue('menu-bg_image', data.menu.bg_image);
+
+    // Menu categories
     data.menu.categories = (currentData.menu.categories || []).map((cat, i) => ({
       label: cat.label,
       items: cat.items.map((item, j) => ({
