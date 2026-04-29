@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ログイン | 炉端酒場 灯り 管理画面</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --black:#0C0B09; --dark:#17150F; --gold:#C9A84C; --gold-dim:rgba(201,168,76,0.15); --text:#F0EBD8; --text-muted:#9A8F7E; --border:rgba(201,168,76,0.25); --danger:#C0392B; --success:#27AE60; }
+    body { font-family:'Noto Sans JP',sans-serif; background:var(--dark); min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px 16px; }
+    body::before { content:''; position:fixed; inset:0; background:radial-gradient(ellipse at center top, rgba(201,168,76,0.06) 0%, transparent 70%); pointer-events:none; }
+    .wrap { width:100%; max-width:400px; position:relative; }
+    .logo { text-align:center; margin-bottom:28px; }
+    .logo-icon { font-size:32px; display:block; margin-bottom:8px; }
+    .logo-jp { font-family:'Noto Serif JP',serif; font-size:20px; font-weight:700; color:var(--gold); letter-spacing:.15em; }
+    .logo-sub { font-size:11px; color:var(--text-muted); letter-spacing:.3em; text-transform:uppercase; margin-top:4px; }
+    .card { background:rgba(255,255,255,0.04); border-radius:16px; border:1px solid var(--border); backdrop-filter:blur(10px); padding:32px; }
+    .card-title { font-size:17px; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .card-sub { font-size:12px; color:var(--text-muted); margin-bottom:24px; }
+    .form-group { margin-bottom:14px; }
+    label { display:block; font-size:11px; font-weight:500; color:var(--text-muted); letter-spacing:.05em; margin-bottom:5px; }
+    input[type="email"], input[type="password"] { width:100%; padding:11px 14px; border:1.5px solid rgba(201,168,76,0.2); border-radius:8px; font-size:14px; font-family:'Noto Sans JP',sans-serif; color:var(--text); background:rgba(255,255,255,0.06); outline:none; transition:border-color .2s; }
+    input:focus { border-color:var(--gold); }
+    input::placeholder { color:rgba(240,235,216,0.3); }
+    .btn-login { width:100%; padding:12px; background:var(--gold); color:#0C0B09; border:none; border-radius:8px; font-size:14px; font-weight:700; font-family:'Noto Sans JP',sans-serif; cursor:pointer; transition:background .2s; margin-top:4px; }
+    .btn-login:hover { background:#E2C47A; }
+    .btn-login:disabled { opacity:.5; cursor:not-allowed; }
+    .divider { display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--text-muted); font-size:11px; }
+    .divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+    .btn-google { width:100%; padding:11px; background:rgba(255,255,255,0.06); color:var(--text); border:1.5px solid var(--border); border-radius:8px; font-size:14px; font-weight:500; font-family:'Noto Sans JP',sans-serif; cursor:pointer; transition:background .2s; display:flex; align-items:center; justify-content:center; gap:10px; }
+    .btn-google:hover { background:rgba(255,255,255,0.1); }
+    .btn-google:disabled { opacity:.5; cursor:not-allowed; }
+    .reset-link { display:block; text-align:center; margin-top:14px; font-size:11px; color:var(--gold); cursor:pointer; opacity:.8; }
+    .reset-link:hover { opacity:1; }
+    .msg { padding:11px 14px; border-radius:8px; font-size:12px; margin-top:16px; display:none; line-height:1.6; white-space:pre-line; }
+    .msg.show { display:block; }
+    .msg.error { background:rgba(192,57,43,0.15); color:#e74c3c; border:1px solid rgba(192,57,43,0.3); }
+    .msg.success { background:rgba(39,174,96,0.15); color:#2ecc71; border:1px solid rgba(39,174,96,0.3); }
+    .footer { text-align:center; margin-top:20px; font-size:11px; color:var(--text-muted); }
+    @media(max-width:480px){ .card{padding:24px 18px;} }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">
+    <span class="logo-icon">🏮</span>
+    <div class="logo-jp">炉端酒場 灯り</div>
+    <div class="logo-sub">Admin Panel</div>
+  </div>
+  <div class="card">
+    <h2 class="card-title">ログイン</h2>
+    <p class="card-sub">管理者アカウントでログインしてください。</p>
+
+    <div class="form-group">
+      <label>メールアドレス</label>
+      <input type="email" id="emailInput" placeholder="admin@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>パスワード</label>
+      <input type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') doEmailLogin()">
+    </div>
+    <button class="btn-login" id="emailBtn" onclick="doEmailLogin()">ログイン</button>
+
+    <a class="reset-link" onclick="sendResetEmail()">初回パスワード設定 / パスワードを忘れた方</a>
+
+    <div class="divider">または</div>
+
+    <button class="btn-google" id="googleBtn" onclick="doGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Googleでログイン
+    </button>
+
+    <div class="msg" id="login-msg"></div>
+  </div>
+  <div class="footer">&copy; 2015 炉端酒場 灯り — 管理者専用ページ</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+  const SITE_ID = 'izakaya';
+  firebase.initializeApp({
+    apiKey: "AIzaSyCoSxScuwyr7IWOb_Y9-eTT1SJkP7F3PHU",
+    authDomain: "takeroweb-demo.firebaseapp.com",
+    projectId: "takeroweb-demo",
+    storageBucket: "takeroweb-demo.firebasestorage.app",
+    messagingSenderId: "1020678335636",
+    appId: "1:1020678335636:web:c847c9668591859d3c5881"
+  });
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+
+  auth.onAuthStateChanged(user => { if (user) window.location.replace('admin.html'); });
+
+  function showMsg(text, type) {
+    const el = document.getElementById('login-msg');
+    el.textContent = text; el.className = 'msg show ' + type;
+  }
+
+  async function checkWhitelist(email) {
+    try {
+      const doc = await db.collection('sites').doc(SITE_ID).collection('config').doc('admins').get();
+      if (!doc.exists) return true;
+      return doc.data().emails.includes(email.toLowerCase());
+    } catch { return true; }
+  }
+
+  async function doEmailLogin() {
+    const email = document.getElementById('emailInput').value.trim();
+    const pass  = document.getElementById('passwordInput').value;
+    if (!email || !pass) { showMsg('メールアドレスとパスワードを入力してください', 'error'); return; }
+    document.getElementById('emailBtn').disabled = true;
+    try {
+      const result = await auth.signInWithEmailAndPassword(email, pass);
+      if (!await checkWhitelist(result.user.email)) {
+        await auth.signOut();
+        showMsg('このアカウントは管理者として登録されていません。', 'error');
+        document.getElementById('emailBtn').disabled = false;
+      }
+    } catch (err) {
+      const msgs = { 'auth/user-not-found':'メールアドレスが登録されていません。', 'auth/wrong-password':'パスワードが間違っています。', 'auth/invalid-email':'メールアドレスの形式が正しくありません。', 'auth/too-many-requests':'試行回数が多すぎます。しばらくしてからお試しください。' };
+      showMsg(msgs[err.code] || 'ログインに失敗しました。', 'error');
+      document.getElementById('emailBtn').disabled = false;
+    }
+  }
+
+  async function sendResetEmail() {
+    const email = document.getElementById('emailInput').value.trim();
+    if (!email) { showMsg('メールアドレスを入力してください', 'error'); return; }
+    try {
+      await auth.sendPasswordResetEmail(email);
+      showMsg('パスワード設定メールを送信しました。メールボックスをご確認ください。', 'success');
+    } catch (err) {
+      showMsg('メールの送信に失敗しました。メールアドレスをご確認ください。', 'error');
+    }
+  }
+
+  function doGoogleLogin() {
+    document.getElementById('googleBtn').disabled = true;
+    const provider = new firebase.auth.GoogleAuthProvider();
+    auth.signInWithPopup(provider)
+      .then(async result => {
+        if (!await checkWhitelist(result.user.email)) {
+          await auth.signOut();
+          showMsg('このGoogleアカウントはアクセスが許可されていません。', 'error');
+          document.getElementById('googleBtn').disabled = false;
+        }
+      })
+      .catch(e => {
+        if (e.code === 'auth/popup-blocked') {
+          auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+        } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
+          showMsg('ログインに失敗しました。\n' + (e.message || ''), 'error');
+          document.getElementById('googleBtn').disabled = false;
+        } else {
+          document.getElementById('googleBtn').disabled = false;
+        }
+      });
+  }
+
+  auth.getRedirectResult()
+    .then(async result => {
+      if (!result || !result.user) return;
+      if (!await checkWhitelist(result.user.email)) {
+        await auth.signOut();
+        showMsg('このGoogleアカウントはアクセスが許可されていません。', 'error');
+      }
+    }).catch(() => {});
+</script>
+</body>
+</html>
